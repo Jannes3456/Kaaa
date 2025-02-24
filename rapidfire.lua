@@ -1,94 +1,38 @@
-local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local mouse = player:GetMouse()
+local toggleKey = Enum.KeyCode.N
+local wallsVisible = true
 
--- Tasten für Funktionen
-local toggleTriggerbotKey = Enum.KeyCode.V
-local toggleRapidFireKey = Enum.KeyCode.B
-
--- Status der Funktionen
-local triggerbotActive = false
-local rapidFireActive = false
-
--- Schussraten
-local fireRateTriggerbot = 0.01 -- Triggerbot schießt alle 100ms
-local fireRateRapidFire = 0.05  -- Rapid Fire schießt alle 50ms
-
--- Prüft, ob das Ziel ein Gegner ist
-local function isEnemy(target)
-    local targetPlayer = Players:GetPlayerFromCharacter(target.Parent)
-    return targetPlayer and targetPlayer.Team ~= player.Team
-end
-
--- Rapid Fire Funktion
-local function startRapidFire()
-    while rapidFireActive do
-        local tool = character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
-        if tool and tool:FindFirstChild("Activate") then
-            tool:Activate()
-        end
-        task.wait(fireRateRapidFire)
-    end
-end
-
--- Triggerbot Funktion
-local function triggerbot()
-    while triggerbotActive do
-        local target = mouse.Target
-        if target and isEnemy(target) then
-            local tool = character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
-            if tool and tool:FindFirstChild("Activate") then
-                tool:Activate()
+-- Funktion zum Ändern der Transparenz von Wänden
+local function setWallTransparency(transparency)
+    for _, part in ipairs(Workspace:GetDescendants()) do
+        if part:IsA("BasePart") and not part:IsDescendantOf(game.Players.LocalPlayer.Character) then
+            if part.Size.Y > 10 or part.Size.X > 10 then -- Große Objekte als Wände erkennen
+                part.Transparency = transparency
             end
         end
-        task.wait(fireRateTriggerbot)
     end
 end
 
--- Tasteneingaben überwachen
+-- Tastensteuerung für AN/AUS
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
+    if input.KeyCode == toggleKey then
+        wallsVisible = not wallsVisible
+        setWallTransparency(wallsVisible and 0 or 0.8) -- 0 = Sichtbar, 0.8 = Fast unsichtbar
 
-    -- Triggerbot AN/AUS
-    if input.KeyCode == toggleTriggerbotKey then
-        triggerbotActive = not triggerbotActive
-        local state = triggerbotActive and "ENABLED" or "DISABLED"
-        
         game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Triggerbot",
-            Text = "Triggerbot " .. state,
+            Title = "Wallhack",
+            Text = "Wände " .. (wallsVisible and "sichtbar" or "durchsichtig"),
             Duration = 2
         })
-
-        if triggerbotActive then
-            task.spawn(triggerbot)
-        end
-    end
-
-    -- Rapid Fire AN/AUS
-    if input.KeyCode == toggleRapidFireKey then
-        rapidFireActive = not rapidFireActive
-        local state = rapidFireActive and "ENABLED" or "DISABLED"
-        
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Rapid Fire",
-            Text = "Rapid Fire " .. state,
-            Duration = 2
-        })
-
-        if rapidFireActive then
-            task.spawn(startRapidFire)
-        end
     end
 end)
 
--- Lade-Benachrichtigung
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Triggerbot & Rapid Fire",
-    Text = "V = Triggerbot, B = Rapid Fire",
+    Title = "Wallhack",
+    Text = "Drücke N, um Wände durchsichtig zu machen!",
     Duration = 3
 })
