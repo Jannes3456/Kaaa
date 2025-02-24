@@ -7,7 +7,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local mouse = player:GetMouse()
 local triggerbotActive = false
 local toggleKey = Enum.KeyCode.V
-local fireRate = 0.1 -- Wartezeit zwischen Schüssen (100ms)
+local fireRate = 0.02 -- Wartezeit zwischen Schüssen (100ms)
 
 -- Funktion zum Überprüfen, ob das Ziel ein Gegner ist
 local function isEnemy(target)
