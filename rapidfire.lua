@@ -21,7 +21,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     if input.KeyCode == toggleKey then
         wallsVisible = not wallsVisible
-        setWallTransparency(wallsVisible and 0 or 0.4) -- 0 = Sichtbar, 0.8 = Fast unsichtbar
+        setWallTransparency(wallsVisible and 0 or 1) -- 0 = Sichtbar, 0.8 = Fast unsichtbar
 
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Wallhack",
